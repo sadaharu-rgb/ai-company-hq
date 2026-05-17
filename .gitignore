@@ -1,0 +1,12 @@
+node_modules/
+dist/
+dist-server/
+data/
+.env
+.env.local
+.env.*.local
+.env.example
+新しいフォルダー/
+*.local
+.DS_Store
+Thumbs.db

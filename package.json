@@ -1,0 +1,44 @@
+{
+  "name": "ai-company-hq",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:client": "vite --port 5174",
+    "dev:server": "npx tsx server/index.ts",
+    "discord:bot": "npx tsx discord-bot/index.ts",
+    "discord:register": "npx tsx discord-bot/register-commands.ts",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "axios": "^1.7.2",
+    "cors": "^2.8.5",
+    "discord.js": "^14.26.3",
+    "express": "^4.19.2",
+    "p-limit": "^7.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.10",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.19",
+    "concurrently": "^8.2.2",
+    "dotenv": "^16.4.5",
+    "postcss": "^8.4.39",
+    "tailwindcss": "^3.4.6",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.4"
+  }
+}
