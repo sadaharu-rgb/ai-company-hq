@@ -6,6 +6,7 @@ import { データベース初期化 } from './db/データベース.js'
 import 案件ルート from './routes/案件.js'
 import 会議ルート from './routes/会議.js'
 import 株分析ルート from './routes/株分析.js'
+import マーケティングルート from './routes/マーケティング.js'
 
 dotenv.config({ override: true })
 
@@ -31,6 +32,7 @@ app.use('/api/cases', 案件ルート)
 app.use('/api/cases', 会議ルート)
 app.use('/api', 会議ルート)     // /api/departments, /api/meeting/discord
 app.use('/api', 株分析ルート)   // /api/analyze-stock
+app.use('/api/marketing', マーケティングルート) // /api/marketing/posts /ideas /summary
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }))
 

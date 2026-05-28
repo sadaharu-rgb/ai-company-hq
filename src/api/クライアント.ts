@@ -1,5 +1,13 @@
 import axios from 'axios'
-import type { APIレスポンス, 案件, 投稿, 会議 } from '../types'
+import type {
+  APIレスポンス,
+  案件,
+  投稿,
+  会議,
+  公開済み投稿,
+  ネタ候補,
+  マーケティングサマリ,
+} from '../types'
 
 const クライアント = axios.create({ baseURL: '/api', timeout: 30000, headers: { 'Content-Type': 'application/json' } })
 
@@ -46,6 +54,25 @@ export async function 実行アクション記録(案件ID: number, 会議ID: nu
 export async function 部門一覧取得(): Promise<{ id: string; 名前: string }[]> {
   const { data } = await クライアント.get<APIレスポンス<{ id: string; 名前: string }[]>>('/departments')
   return data.data ?? []
+}
+
+// ─── マーケティングAPI ─────────────────────────────────
+export async function 公開済み投稿一覧取得(): Promise<公開済み投稿[]> {
+  const { data } = await クライアント.get<APIレスポンス<公開済み投稿[]>>('/marketing/posts')
+  return data.data ?? []
+}
+
+export async function ネタ候補一覧取得(オプション?: { 評価?: 'S' | 'A' | 'B'; 草稿のみ?: boolean }): Promise<ネタ候補[]> {
+  const params: Record<string, string> = {}
+  if (オプション?.評価) params.評価 = オプション.評価
+  if (オプション?.草稿のみ) params.草稿 = 'true'
+  const { data } = await クライアント.get<APIレスポンス<ネタ候補[]>>('/marketing/ideas', { params })
+  return data.data ?? []
+}
+
+export async function マーケティングサマリ取得(): Promise<マーケティングサマリ | null> {
+  const { data } = await クライアント.get<APIレスポンス<マーケティングサマリ>>('/marketing/summary')
+  return data.data ?? null
 }
 
 // AI会議（参加部門IDs省略 = Projects配下の全部門）

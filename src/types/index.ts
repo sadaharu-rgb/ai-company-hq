@@ -61,3 +61,45 @@ export type APIレスポンス<T> = {
   data?: T
   error?: string
 }
+
+// ─── マーケティングタブ用型定義 ─────────────────────────
+
+export type 公開済み投稿 = {
+  通し番号: string
+  日付: string
+  タイトル: string
+  内容: string
+  ハッシュタグ: string[]
+  ツイートID?: string
+  反応?: string
+  連動note?: string
+}
+
+export type ネタ候補 = {
+  ID: string
+  タイトル: string
+  カテゴリ: string
+  評価: 'S' | 'A' | 'B' | '不明'
+  草稿あり: boolean
+  生成日?: string
+}
+
+export type マーケティングサマリ = {
+  公開済み投稿数: number
+  公開済み最新日付: string | null
+  ネタサマリ: {
+    総数: number
+    S級: number
+    A級: number
+    B級: number
+    不明: number
+    草稿あり: number
+    カテゴリ別: Record<string, number>
+  }
+  KPI: {
+    TODO: string
+    現在の取得元: string
+  }
+}
+
+export type 画面モード = 'HQ' | 'Marketing'
