@@ -7,6 +7,7 @@ import type {
   公開済み投稿,
   ネタ候補,
   マーケティングサマリ,
+  プロジェクト進捗,
 } from '../types'
 
 const クライアント = axios.create({ baseURL: '/api', timeout: 30000, headers: { 'Content-Type': 'application/json' } })
@@ -114,4 +115,53 @@ export async function AI会議開始(
       } catch { /* ignore */ }
     }
   }
+}
+
+// ─── 管理者認証・プロジェクト進捗 ─────────────────────────
+// セッションは sessionStorage（タブを閉じると消える）。localStorage より短命志向。
+const セッションキー = 'hq_admin_session'
+
+export function セッション取得(): string {
+  return sessionStorage.getItem(セッションキー) ?? ''
+}
+export function セッション破棄(): void {
+  sessionStorage.removeItem(セッションキー)
+}
+
+/** secret でログインしセッションを保存。成功で true */
+export async function 管理者ログイン(secret: string): Promise<boolean> {
+  try {
+    const { data } = await クライアント.post<{ success: boolean; session?: string; error?: string }>(
+      '/auth/login', { secret },
+    )
+    if (data.success && data.session) {
+      sessionStorage.setItem(セッションキー, data.session)
+      return true
+    }
+    return false
+  } catch {
+    return false
+  }
+}
+
+/** 保存済みセッションが有効か（起動時チェック用） */
+export async function セッション有効確認(): Promise<boolean> {
+  const session = セッション取得()
+  if (!session) return false
+  try {
+    const { data } = await クライアント.get<{ success: boolean; valid: boolean }>('/auth/verify', {
+      headers: { Authorization: `Bearer ${session}` },
+    })
+    return data.valid === true
+  } catch {
+    return false
+  }
+}
+
+/** 全プロジェクトの進捗を取得（認証必須・Bearer 付与） */
+export async function プロジェクト進捗取得(): Promise<プロジェクト進捗[]> {
+  const { data } = await クライアント.get<APIレスポンス<プロジェクト進捗[]>>('/projects/progress', {
+    headers: { Authorization: `Bearer ${セッション取得()}` },
+  })
+  return data.data ?? []
 }

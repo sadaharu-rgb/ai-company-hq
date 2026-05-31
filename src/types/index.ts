@@ -102,4 +102,18 @@ export type マーケティングサマリ = {
   }
 }
 
-export type 画面モード = 'HQ' | 'Marketing'
+export type 画面モード = 'HQ' | 'Marketing' | 'Progress'
+
+// ─── プロジェクト進捗（管理者ダッシュボード）─────────────────
+export type プロジェクト進捗 = {
+  名前: string
+  稼働: string
+  最終コミット日時: string | null
+  最終コミットハッシュ: string | null
+  最終コミットメッセージ: string | null
+  ブランチ: string | null
+  未コミット数: number
+  テスト数: number
+  状態: '活発' | '安定' | '停滞' | '不明'
+  取得失敗: boolean
+}
