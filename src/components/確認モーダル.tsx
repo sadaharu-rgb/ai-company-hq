@@ -5,11 +5,12 @@ type Props = {
   種別: '通常' | '危険'
   確認ラベル: string
   キャンセルラベル?: string
+  実行中?: boolean  // true中は両ボタン無効＋「処理中…」表示（二度押し防止）
   onConfirm: () => void
   onCancel: () => void
 }
 
-export default function 確認モーダル({ タイトル, 説明, 詳細, 種別, 確認ラベル, キャンセルラベル = 'キャンセル', onConfirm, onCancel }: Props) {
+export default function 確認モーダル({ タイトル, 説明, 詳細, 種別, 確認ラベル, キャンセルラベル = 'キャンセル', 実行中 = false, onConfirm, onCancel }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 overflow-hidden">
@@ -30,12 +31,14 @@ export default function 確認モーダル({ タイトル, 説明, 詳細, 種�
         <div className="flex gap-2 px-5 py-4">
           <button
             onClick={onCancel}
-            className="flex-1 ボタン副"
+            disabled={実行中}
+            className="flex-1 ボタン副 disabled:opacity-40"
           >{キャンセルラベル}</button>
           <button
             onClick={onConfirm}
-            className={`flex-1 ${種別 === '危険' ? 'ボタン危険' : 'ボタン主'}`}
-          >{確認ラベル}</button>
+            disabled={実行中}
+            className={`flex-1 ${種別 === '危険' ? 'ボタン危険' : 'ボタン主'} disabled:opacity-40`}
+          >{実行中 ? '処理中…' : 確認ラベル}</button>
         </div>
       </div>
     </div>

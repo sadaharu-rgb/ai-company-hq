@@ -32,15 +32,21 @@ const アクション一覧 = [
 
 export default function 投稿カード({ 投稿: p, onDeleted, 会議情報, onアクション }: Props) {
   const [削除確認, 削除確認設定] = useState(false)
+  const [削除中, 削除中設定] = useState(false)
   const [アクション中, アクション中設定] = useState(false)
   const 部門 = 部門マップ[p.部門ID]
   const 部門表示名 = 部門?.名前 ?? p.部門ID.replace(/^\d+_/, '')
   const isCEO = CEOか(p.部門ID)
 
   const 削除実行 = async () => {
-    await 投稿削除(p.案件ID, p.id)
-    削除確認設定(false)
-    onDeleted()
+    削除中設定(true)
+    try {
+      await 投稿削除(p.案件ID, p.id)
+      削除確認設定(false)
+      onDeleted()
+    } finally {
+      削除中設定(false)
+    }
   }
 
   const アクション実行 = async (action: string) => {
@@ -150,6 +156,7 @@ export default function 投稿カード({ 投稿: p, onDeleted, 会議情報, on
             詳細={[{ ラベル: '部門', 値: '👑 CEO 統合判断' }]}
             種別="危険"
             確認ラベル="削除する"
+            実行中={削除中}
             onConfirm={削除実行}
             onCancel={() => 削除確認設定(false)}
           />

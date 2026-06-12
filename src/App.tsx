@@ -65,7 +65,7 @@ export default function App() {
       </header>
 
       {/* ボディ */}
-      <div className="max-w-7xl mx-auto px-5 py-5 flex gap-5">
+      <div className="max-w-7xl mx-auto px-5 py-5 flex flex-col md:flex-row gap-5">
         {画面モード === 'HQ' && <サイドバー />}
         <main className="flex-1 min-w-0">
           {画面モード === 'HQ' && <ダッシュボード />}

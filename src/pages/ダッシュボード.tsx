@@ -40,7 +40,7 @@ export default function ダッシュボード() {
     案件一覧, 案件一覧設定,
     投稿一覧, 投稿一覧設定,
     選択案件ID, 選択案件ID設定,
-    選択部門ID,
+    選択部門ID, 選択部門ID設定,
     AI会議中, AI会議中設定,
     投稿追加: ストア投稿追加,
   } = useストア()
@@ -69,6 +69,8 @@ export default function ダッシュボード() {
   const [全部門使用, 全部門使用設定] = useState(true) // true = Projects配下の全CLAUDE.mdを使用
   const [AI会議確認, AI会議確認設定] = useState(false)
   const [会議ステータス, 会議ステータス設定] = useState('')
+  const [作成エラー, 作成エラー設定] = useState<string | null>(null)
+  const [部門取得失敗, 部門取得失敗設定] = useState(false)
 
   // 会議グルーピング用
   const [会議一覧, 会議一覧設定] = useState<会議[]>([])
@@ -78,7 +80,8 @@ export default function ダッシュボード() {
   useEffect(() => {
     部門一覧取得().then(部門 => {
       利用可能部門設定(部門.filter(d => !d.id.startsWith('00_')))
-    }).catch(() => {/* サーバー未起動時は無視 */})
+      部門取得失敗設定(false)
+    }).catch(() => 部門取得失敗設定(true))
   }, [])
 
   const 選択プロジェクト = 案件一覧.find(c => c.id === 選択案件ID)
@@ -91,6 +94,7 @@ export default function ダッシュボード() {
   }
 
   const プロジェクト作成実行 = async () => {
+    作成エラー設定(null)
     try {
       const c = await 案件作成({ タイトル: 新タイトル, 説明: 新説明, 優先度: 新優先度, カテゴリ: 新カテゴリ, URL: 新URL || undefined })
       案件一覧設定([{ ...c, 投稿数: 0 }, ...案件一覧])
@@ -99,7 +103,8 @@ export default function ダッシュボード() {
       新タイトル設定(''); 新説明設定(''); 新優先度設定('中'); 新カテゴリ設定('その他'); 新URL設定('')
       await プロジェクトを開く(c.id)
     } catch (e) {
-      alert(`作成に失敗しました: ${String(e)}`)
+      作成確認設定(false)
+      作成エラー設定(`作成に失敗しました: ${String(e)}`)
     }
   }
 
@@ -236,9 +241,14 @@ export default function ダッシュボード() {
                 <input className="入力欄" value={新URL} onChange={e => 新URL設定(e.target.value)} placeholder="例: http://localhost:5174" />
               </div>
             </div>
+            {作成エラー && (
+              <div className="bg-red-50 border border-red-100 text-red-600 text-xs px-3 py-2 rounded-lg">
+                {作成エラー}
+              </div>
+            )}
             <div className="flex gap-2 pt-1">
               <button className="ボタン主" onClick={() => 作成確認設定(true)} disabled={!新タイトル}>作成</button>
-              <button className="ボタン副" onClick={() => フォーム表示設定(false)}>キャンセル</button>
+              <button className="ボタン副" onClick={() => { フォーム表示設定(false); 作成エラー設定(null) }}>キャンセル</button>
             </div>
           </div>
         )}
@@ -443,7 +453,9 @@ export default function ダッシュボード() {
                         }`}
                       >{d.名前}</button>
                     ))
-                  : <p className="text-xs text-gray-400">部門読み込み中...</p>
+                  : 部門取得失敗
+                    ? <p className="text-xs text-red-500">⚠️ サーバーに接続できません（部門一覧を取得できませんでした）</p>
+                    : <p className="text-xs text-gray-400">部門読み込み中...</p>
                 }
               </div>
             )}
@@ -469,6 +481,12 @@ export default function ダッシュボード() {
         <div className="text-xs text-gray-500 bg-white px-4 py-2 rounded-xl border border-gray-100 flex items-center gap-2">
           <span>{利用可能部門.find(d => d.id === 選択部門ID)?.名前 ?? 選択部門ID}</span>
           <span className="text-gray-300">の投稿を絞り込み中</span>
+          <button
+            onClick={() => 選択部門ID設定(null)}
+            className="ml-auto shrink-0 text-gray-400 hover:text-gray-700 transition-colors"
+          >
+            ✕ 解除
+          </button>
         </div>
       )}
 
